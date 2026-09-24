@@ -273,6 +273,7 @@ export default function Home() {
             onPlaying={() => setVideoReady(true)}
             onError={() => setVideoFailed(true)}
           >
+            <source src="/landing-video.webm" type="video/webm" />
             <source src="/landing-video.mp4" type="video/mp4" />
           </video>
         </div>

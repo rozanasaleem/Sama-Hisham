@@ -192,21 +192,49 @@ export default function Home() {
     }
 
     video.muted = true;
+    video.defaultMuted = true;
+    video.playsInline = true;
+    video.setAttribute("muted", "");
+    video.setAttribute("playsinline", "");
+    video.setAttribute("webkit-playsinline", "");
+
     const playVideo = () => {
-      setVideoReady(true);
-      void video.play().catch(() => {
-        setVideoFailed(true);
-        // Some browsers still delay autoplay in low-power or data-saver modes.
-      });
+      void video
+        .play()
+        .then(() => {
+          setVideoReady(true);
+          setVideoFailed(false);
+        })
+        .catch(() => {
+          setVideoFailed(true);
+          // Safari may still block autoplay in low-power or data-saver modes.
+        });
     };
 
     if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
       playVideo();
-      return;
     }
 
-    video.addEventListener("canplay", playVideo, { once: true });
-    return () => video.removeEventListener("canplay", playVideo);
+    const playWhenVisible = () => {
+      if (document.visibilityState === "visible") {
+        playVideo();
+      }
+    };
+
+    video.addEventListener("loadedmetadata", playVideo);
+    video.addEventListener("loadeddata", playVideo);
+    video.addEventListener("canplay", playVideo);
+    document.addEventListener("visibilitychange", playWhenVisible);
+    window.addEventListener("focus", playVideo);
+    video.load();
+
+    return () => {
+      video.removeEventListener("loadedmetadata", playVideo);
+      video.removeEventListener("loadeddata", playVideo);
+      video.removeEventListener("canplay", playVideo);
+      document.removeEventListener("visibilitychange", playWhenVisible);
+      window.removeEventListener("focus", playVideo);
+    };
   }, []);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {

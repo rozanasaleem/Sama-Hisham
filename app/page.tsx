@@ -333,8 +333,9 @@ export default function Home() {
             className="film-play-button"
             type="button"
             onClick={handleHeroVideoPlay}
+            aria-label="Play wedding film"
           >
-            Tap to play the film
+            <span aria-hidden="true" />
           </button>
         ) : null}
         <nav className="topline" aria-label="Wedding navigation">

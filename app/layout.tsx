@@ -23,18 +23,18 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     metadataBase,
-    title: "Sama Matar & Hisham Daraghmeh",
+    title: "Sama Matar & Hisham Daraghme",
     description:
-      "Wedding invitation and RSVP for Sama Matar and Hisham Daraghmeh, 10 October 2026 at Odeh Hotel, Aida's Garden.",
+      "Wedding invitation and RSVP for Sama Matar and Hisham Daraghme, 10 October 2026 at 5:00 PM at Odeh Hotel, Aida's Garden.",
     openGraph: {
       title: "Sama & Hisham",
-      description: "10 October 2026 at Odeh Hotel, Aida's Garden.",
+      description: "10 October 2026 at 5:00 PM at Odeh Hotel, Aida's Garden.",
       images: [{ url: "/og.png", width: 1200, height: 630 }],
     },
     twitter: {
       card: "summary_large_image",
       title: "Sama & Hisham",
-      description: "10 October 2026 at Odeh Hotel, Aida's Garden.",
+      description: "10 October 2026 at 5:00 PM at Odeh Hotel, Aida's Garden.",
       images: ["/og.png"],
     },
   };
@@ -47,6 +47,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link
+          rel="preload"
+          href="/landing-video.mp4"
+          as="video"
+          type="video/mp4"
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

@@ -199,6 +199,8 @@ export default function Home() {
     video.setAttribute("webkit-playsinline", "");
 
     const playVideo = () => {
+      video.muted = true;
+      video.defaultMuted = true;
       void video
         .play()
         .then(() => {
@@ -206,8 +208,11 @@ export default function Home() {
           setVideoFailed(false);
         })
         .catch(() => {
-          setVideoFailed(true);
-          // Safari may still block autoplay in low-power or data-saver modes.
+          window.setTimeout(() => {
+            if (video.paused) {
+              setVideoFailed(true);
+            }
+          }, 900);
         });
     };
 
@@ -226,7 +231,7 @@ export default function Home() {
     video.addEventListener("canplay", playVideo);
     document.addEventListener("visibilitychange", playWhenVisible);
     window.addEventListener("focus", playVideo);
-    video.load();
+    window.requestAnimationFrame(playVideo);
 
     return () => {
       video.removeEventListener("loadedmetadata", playVideo);
@@ -236,6 +241,23 @@ export default function Home() {
       window.removeEventListener("focus", playVideo);
     };
   }, []);
+
+  function handleHeroVideoPlay() {
+    const video = videoRef.current;
+    if (!video) {
+      return;
+    }
+
+    video.muted = true;
+    video.defaultMuted = true;
+    void video
+      .play()
+      .then(() => {
+        setVideoReady(true);
+        setVideoFailed(false);
+      })
+      .catch(() => setVideoFailed(true));
+  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -301,11 +323,20 @@ export default function Home() {
             onPlaying={() => setVideoReady(true)}
             onError={() => setVideoFailed(true)}
           >
-            <source src="/landing-video.webm" type="video/webm" />
             <source src="/landing-video.mp4" type="video/mp4" />
+            <source src="/landing-video.webm" type="video/webm" />
           </video>
         </div>
         <div className="film-overlay" aria-hidden="true" />
+        {videoFailed ? (
+          <button
+            className="film-play-button"
+            type="button"
+            onClick={handleHeroVideoPlay}
+          >
+            Tap to play the film
+          </button>
+        ) : null}
         <nav className="topline" aria-label="Wedding navigation">
           <a href="#details">{t.nav.details}</a>
           <a href="#rsvp">{t.nav.rsvp}</a>

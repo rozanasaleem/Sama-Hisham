@@ -1,4 +1,3 @@
-import { getDb } from "../../../db";
 import { rsvps } from "../../../db/schema";
 import { findInvitedGuest } from "../../../lib/guests";
 
@@ -64,6 +63,7 @@ export async function POST(request: Request) {
       );
     }
 
+    const { getDb } = await import("../../../db");
     const db = getDb();
     await db.insert(rsvps).values({
       guestName,

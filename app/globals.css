@@ -11,6 +11,8 @@
   --sage: #d1e2c5;
   --surface: #f3f5ee;
   --line: rgba(88, 102, 74, 0.14);
+  --font-geist-sans: Arial, Helvetica, sans-serif;
+  --font-geist-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
 }
 
 @theme inline {

@@ -17,10 +17,11 @@ export async function generateMetadata(): Promise<Metadata> {
       "Wedding invitation and RSVP for Sama Matar and Hisham Daraghme, 10 October 2026 at 5:00 PM at Odeh Hotel, Aida's Garden.",
     icons: {
       icon: [
-        { url: "/monogram-mark.png", type: "image/png" },
-        { url: "/favicon.svg", type: "image/svg+xml" },
+        { url: "/favicon-32x32.png?v=2", sizes: "32x32", type: "image/png" },
+        { url: "/favicon-16x16.png?v=2", sizes: "16x16", type: "image/png" },
+        { url: "/icon-192.png?v=2", sizes: "192x192", type: "image/png" },
       ],
-      apple: [{ url: "/monogram-mark.png", type: "image/png" }],
+      apple: [{ url: "/apple-touch-icon.png?v=2", sizes: "180x180", type: "image/png" }],
     },
     openGraph: {
       title: "Sama & Hisham",
@@ -44,6 +45,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=2" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=2" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=2" />
       </head>
       <body>{children}</body>
     </html>

@@ -15,6 +15,13 @@ export async function generateMetadata(): Promise<Metadata> {
     title: "Sama Matar & Hisham Daraghme",
     description:
       "Wedding invitation and RSVP for Sama Matar and Hisham Daraghme, 10 October 2026 at 5:00 PM at Odeh Hotel, Aida's Garden.",
+    icons: {
+      icon: [
+        { url: "/monogram-mark.png", type: "image/png" },
+        { url: "/favicon.svg", type: "image/svg+xml" },
+      ],
+      apple: [{ url: "/monogram-mark.png", type: "image/png" }],
+    },
     openGraph: {
       title: "Sama & Hisham",
       description: "10 October 2026 at 5:00 PM at Odeh Hotel, Aida's Garden.",

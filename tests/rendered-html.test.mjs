@@ -18,6 +18,7 @@ test("defines the wedding invitation content", async () => {
   assert.match(source, /10 October 2026/);
   assert.match(source, /Odeh Hotel,\s*Aida's Garden/);
   assert.match(source, /Will you be there\?/);
+  assert.match(source, /Dear \$\{name\}/);
   assert.match(source, /بتكونوا معنا؟/);
   assert.match(source, /Our forever begins in/);
   assert.match(source, /A garden evening, softly unfolding/);

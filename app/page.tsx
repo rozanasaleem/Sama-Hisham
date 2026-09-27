@@ -82,7 +82,7 @@ const copy = {
     rsvp: {
       label: "RSVP",
       title: "Will you be there?",
-      personalTitle: (name: string) => `${name}, will you be there?`,
+      personalTitle: (name: string) => `Dear ${name}, will you be there?`,
       body: "We would love to see you there. Please RSVP by 3 October at the latest.",
       personalBody: "We would love to see you there. Please RSVP by 3 October at the latest.",
       missingGuest: "Open your personal invitation link to RSVP.",
@@ -139,7 +139,7 @@ const copy = {
     rsvp: {
       label: "أكدوا حضوركم",
       title: "بتكونوا معنا؟",
-      personalTitle: (name: string) => `${name}، بتكونوا معنا؟`,
+      personalTitle: (name: string) => `عزيزنا/عزيزتنا ${name}، بتكونوا معنا؟`,
       body: "منحب نشوفكم معنا. يا ريت تأكدولنا حضوركم قبل 3 أكتوبر كحد أقصى.",
       personalBody: "منحب نشوفكم معنا. يا ريت تأكدولنا حضوركم قبل 3 أكتوبر كحد أقصى.",
       missingGuest: "افتحوا رابط دعوتكم الخاص عشان تأكدوا الحضور.",

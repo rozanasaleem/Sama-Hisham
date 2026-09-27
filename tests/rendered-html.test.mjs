@@ -34,6 +34,8 @@ test("defines the wedding invitation content", async () => {
   assert.match(source, /guestName/);
   assert.match(source, /guestSlug/);
   assert.match(source, /plusOneName/);
+  assert.match(source, /plusOneIncluded/);
+  assert.match(source, /No, just me/);
   assert.match(source, /primaryGuestName && namedPlusOne/);
   assert.match(source, /isArabic \? "و" : "and"/);
   assert.match(source, /Mira Afaneh/);

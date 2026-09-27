@@ -87,6 +87,9 @@ const copy = {
       personalBody: "We would love to see you there. Please RSVP by 3 October at the latest.",
       missingGuest: "Open your personal invitation link to RSVP.",
       guestName: "Your name",
+      plusOneChoice: "Will your plus-one join you?",
+      plusOneYes: (name?: string) => name ? `Yes, with ${name}` : "Yes, I will bring a plus-one",
+      plusOneNo: "No, just me",
       plusOneName: "Plus-one name",
       plusOneHint: "Optional, if you already know who is joining you.",
       attend: "Attend",
@@ -141,6 +144,9 @@ const copy = {
       personalBody: "منحب نشوفكم معنا. يا ريت تأكدولنا حضوركم قبل 3 أكتوبر كحد أقصى.",
       missingGuest: "افتحوا رابط دعوتكم الخاص عشان تأكدوا الحضور.",
       guestName: "الاسم",
+      plusOneChoice: "هل سيحضر مرافقكم معكم؟",
+      plusOneYes: (name?: string) => name ? `نعم، مع ${name}` : "نعم، سأحضر مع مرافق",
+      plusOneNo: "لا، سأحضر لوحدي",
       plusOneName: "اسم المرافق",
       plusOneHint: "اختياري، إذا بتعرفوا مين رح يكون معكم.",
       attend: "رح أحضر",
@@ -157,6 +163,7 @@ export default function Home() {
   const [status, setStatus] = useState<RsvpStatus>("idle");
   const [message, setMessage] = useState("");
   const [guestSlug, setGuestSlug] = useState("");
+  const [plusOneIncluded, setPlusOneIncluded] = useState(false);
   const [countdown, setCountdown] = useState([0, 0, 0, 0]);
   const [videoReady, setVideoReady] = useState(false);
   const [videoFailed, setVideoFailed] = useState(false);
@@ -181,6 +188,10 @@ export default function Home() {
       setLang(selectedGuest.language);
     }
   }, [selectedGuest?.language]);
+
+  useEffect(() => {
+    setPlusOneIncluded(Boolean(selectedGuest?.canBringPlusOne && namedPlusOne));
+  }, [namedPlusOne, selectedGuest?.canBringPlusOne]);
 
   useEffect(() => {
     function updateCountdown() {
@@ -280,10 +291,12 @@ export default function Home() {
     const submitter = (event.nativeEvent as SubmitEvent)
       .submitter as HTMLButtonElement | null;
     const formData = new FormData(form);
+    const isBringingPlusOne = formData.get("plusOneIncluded") === "yes";
     const payload = {
       guestSlug: String(formData.get("guestSlug") ?? ""),
       guestName: String(formData.get("guestName") ?? ""),
-      plusOneName: String(formData.get("plusOneName") ?? ""),
+      plusOneIncluded: isBringingPlusOne ? "yes" : "no",
+      plusOneName: isBringingPlusOne ? String(formData.get("plusOneName") ?? "") : "",
       attending: submitter?.value === "no" ? "no" : "yes",
       website: String(formData.get("website") ?? ""),
     };
@@ -474,16 +487,44 @@ export default function Home() {
           )}
 
           {selectedGuest?.canBringPlusOne ? (
-            <label className="full">
-              {t.rsvp.plusOneName}
-              <input
-                name="plusOneName"
-                type="text"
-                autoComplete="name"
-                defaultValue={selectedGuest.plusOneName ?? ""}
-                placeholder={t.rsvp.plusOneHint}
-              />
-            </label>
+            <fieldset className="plus-one-options full">
+              <legend>{t.rsvp.plusOneChoice}</legend>
+              <div className="radio-group">
+                <label>
+                  <input
+                    name="plusOneIncluded"
+                    type="radio"
+                    value="yes"
+                    checked={plusOneIncluded}
+                    onChange={() => setPlusOneIncluded(true)}
+                  />
+                  <span>{t.rsvp.plusOneYes(namedPlusOne)}</span>
+                </label>
+                <label>
+                  <input
+                    name="plusOneIncluded"
+                    type="radio"
+                    value="no"
+                    checked={!plusOneIncluded}
+                    onChange={() => setPlusOneIncluded(false)}
+                  />
+                  <span>{t.rsvp.plusOneNo}</span>
+                </label>
+              </div>
+
+              {plusOneIncluded ? (
+                <label className="plus-one-name">
+                  {t.rsvp.plusOneName}
+                  <input
+                    name="plusOneName"
+                    type="text"
+                    autoComplete="name"
+                    defaultValue={selectedGuest.plusOneName ?? ""}
+                    placeholder={t.rsvp.plusOneHint}
+                  />
+                </label>
+              ) : null}
+            </fieldset>
           ) : null}
 
           <label className="honeypot">

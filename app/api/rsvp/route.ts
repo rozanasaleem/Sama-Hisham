@@ -22,6 +22,7 @@ export async function POST(request: Request) {
       guestName?: string;
       firstName?: string;
       lastName?: string;
+      plusOneIncluded?: string;
       plusOneName?: string;
       attending?: string;
       website?: string;
@@ -44,8 +45,9 @@ export async function POST(request: Request) {
       80
     );
     const attending = payload.attending === "no" ? "no" : "yes";
+    const plusOneIncluded = payload.plusOneIncluded !== "no";
     const plusOneName =
-      attending === "yes" && invitedGuest?.canBringPlusOne
+      attending === "yes" && invitedGuest?.canBringPlusOne && plusOneIncluded
         ? cleanText(payload.plusOneName, 120)
         : "";
 

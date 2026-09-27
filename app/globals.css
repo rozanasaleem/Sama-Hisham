@@ -657,6 +657,45 @@ h3 {
   font-weight: 400;
 }
 
+.plus-one-options {
+  border: 0;
+  padding: 0;
+}
+
+.plus-one-options legend {
+  color: var(--muted);
+  font-size: 0.92rem;
+  padding: 0;
+}
+
+.radio-group {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.radio-group label {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  background: #fbfaf6;
+  color: var(--foreground);
+}
+
+.radio-group input {
+  width: auto;
+  margin: 0;
+  accent-color: var(--foreground);
+}
+
+.plus-one-name {
+  margin-top: 4px;
+}
+
 .invitation-missing {
   margin: 0;
   color: var(--tangerine);
@@ -849,6 +888,10 @@ a:focus-visible {
   }
 
   .rsvp-form {
+    grid-template-columns: 1fr;
+  }
+
+  .radio-group {
     grid-template-columns: 1fr;
   }
 }

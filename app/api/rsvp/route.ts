@@ -19,6 +19,38 @@ function toRouteErrorMessage(error: unknown) {
   return "Unable to save your RSVP. Please try again.";
 }
 
+async function saveToGoogleSheet(rsvp: {
+  guestSlug: string;
+  guestName: string;
+  firstName: string;
+  lastName: string;
+  plusOneIncluded: boolean;
+  plusOneName: string | null;
+  attending: "yes" | "no";
+}) {
+  const webhookUrl = process.env.RSVP_GOOGLE_SHEET_WEBHOOK_URL;
+
+  if (!webhookUrl) {
+    return false;
+  }
+
+  const response = await fetch(webhookUrl, {
+    method: "POST",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify({
+      ...rsvp,
+      secret: process.env.RSVP_GOOGLE_SHEET_WEBHOOK_SECRET ?? "",
+      submittedAt: new Date().toISOString(),
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Google Sheet RSVP sync failed.");
+  }
+
+  return true;
+}
+
 export async function POST(request: Request) {
   try {
     const payload = (await request.json()) as {
@@ -70,17 +102,31 @@ export async function POST(request: Request) {
     }
 
     const rsvp = {
+      guestSlug,
       guestName,
       firstName,
       lastName,
       plusOneName: plusOneName || null,
+      plusOneIncluded,
       attending,
-    };
+    } as const;
+
+    const savedToGoogleSheet = await saveToGoogleSheet(rsvp);
+
+    if (savedToGoogleSheet) {
+      return Response.json({ ok: true }, { status: 201 });
+    }
 
     try {
       const { getDb } = await import("../../../db");
       const db = getDb();
-      await db.insert(rsvps).values(rsvp);
+      await db.insert(rsvps).values({
+        guestName: rsvp.guestName,
+        firstName: rsvp.firstName,
+        lastName: rsvp.lastName,
+        plusOneName: rsvp.plusOneName,
+        attending: rsvp.attending,
+      });
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unexpected error";
 

@@ -58,8 +58,9 @@ test("defines the wedding invitation content", async () => {
 });
 
 test("keeps production assets and storage wiring in place", async () => {
-  const [page, layout, packageJson, hosting, migration] = await Promise.all([
+  const [page, route, layout, packageJson, hosting, migration] = await Promise.all([
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/api/rsvp/route.ts", import.meta.url), "utf8"),
     readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
     readFile(new URL("../package.json", import.meta.url), "utf8"),
     readFile(new URL("../.openai/hosting.json", import.meta.url), "utf8"),
@@ -67,6 +68,8 @@ test("keeps production assets and storage wiring in place", async () => {
   ]);
 
   assert.match(page, /\/api\/rsvp/);
+  assert.match(route, /RSVP_GOOGLE_SHEET_WEBHOOK_URL/);
+  assert.match(route, /RSVP_GOOGLE_SHEET_WEBHOOK_SECRET/);
   assert.match(page, /Open Map/);
   assert.match(layout, /\/og\.png/);
   assert.match(hosting, /"d1": "DB"/);

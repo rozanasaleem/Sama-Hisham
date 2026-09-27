@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { invitedGuests } from "../lib/guests";
 
 const mapUrl =
@@ -181,6 +181,15 @@ export default function Home() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     setGuestSlug(params.get("invite") ?? params.get("guest") ?? "");
+  }, []);
+
+  useLayoutEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+
+    if ((params.has("invite") || params.has("guest")) && window.location.hash === "#rsvp") {
+      window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    }
   }, []);
 
   useEffect(() => {

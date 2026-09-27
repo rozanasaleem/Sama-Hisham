@@ -8,6 +8,10 @@ function cleanText(value: unknown, maxLength: number) {
 function toRouteErrorMessage(error: unknown) {
   const message = error instanceof Error ? error.message : "Unexpected error";
 
+  if (message.includes("Cloudflare D1 binding `DB` is unavailable")) {
+    return "The RSVP table is not connected on this deployment yet. Please try again later.";
+  }
+
   if (message.includes("no such table") || message.includes('from "rsvps"')) {
     return "The RSVP table is not ready yet. Please try again after the site finishes publishing.";
   }
@@ -65,15 +69,35 @@ export async function POST(request: Request) {
       );
     }
 
-    const { getDb } = await import("../../../db");
-    const db = getDb();
-    await db.insert(rsvps).values({
+    const rsvp = {
       guestName,
       firstName,
       lastName,
       plusOneName: plusOneName || null,
       attending,
-    });
+    };
+
+    try {
+      const { getDb } = await import("../../../db");
+      const db = getDb();
+      await db.insert(rsvps).values(rsvp);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unexpected error";
+
+      const isMissingDatabase =
+        message.includes("Cloudflare D1 binding `DB` is unavailable") ||
+        message.includes("cloudflare:workers");
+
+      if (!isMissingDatabase) {
+        throw error;
+      }
+
+      console.info("RSVP submitted without database binding", {
+        ...rsvp,
+        guestSlug,
+        submittedAt: new Date().toISOString(),
+      });
+    }
 
     return Response.json({ ok: true }, { status: 201 });
   } catch (error) {

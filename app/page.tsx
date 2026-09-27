@@ -164,11 +164,23 @@ export default function Home() {
   const t = copy[lang];
   const isArabic = lang === "ar";
   const selectedGuest = invitedGuests.find((guest) => guest.slug === guestSlug);
+  const primaryGuestName = selectedGuest?.firstName || selectedGuest?.name;
+  const namedPlusOne = selectedGuest?.plusOneName?.trim();
+  const personalizedName =
+    primaryGuestName && namedPlusOne
+      ? `${primaryGuestName} ${isArabic ? "و" : "and"} ${namedPlusOne}`
+      : primaryGuestName;
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    setGuestSlug(params.get("guest") ?? "");
+    setGuestSlug(params.get("invite") ?? params.get("guest") ?? "");
   }, []);
+
+  useEffect(() => {
+    if (selectedGuest?.language) {
+      setLang(selectedGuest.language);
+    }
+  }, [selectedGuest?.language]);
 
   useEffect(() => {
     function updateCountdown() {
@@ -444,7 +456,7 @@ export default function Home() {
         <div className="rsvp-heading">
           <p className="section-label">{t.rsvp.label}</p>
           <h2 id="rsvp-title">
-            {selectedGuest ? t.rsvp.personalTitle(selectedGuest.name) : t.rsvp.title}
+            {personalizedName ? t.rsvp.personalTitle(personalizedName) : t.rsvp.title}
           </h2>
           <p>{selectedGuest ? t.rsvp.personalBody : t.rsvp.body}</p>
         </div>
@@ -468,6 +480,7 @@ export default function Home() {
                 name="plusOneName"
                 type="text"
                 autoComplete="name"
+                defaultValue={selectedGuest.plusOneName ?? ""}
                 placeholder={t.rsvp.plusOneHint}
               />
             </label>

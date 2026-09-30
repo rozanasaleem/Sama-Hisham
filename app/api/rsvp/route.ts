@@ -1,12 +1,22 @@
 import { rsvps } from "../../../db/schema";
 import { findInvitedGuest } from "../../../lib/guests";
 
+export const dynamic = "force-dynamic";
+
 function cleanText(value: unknown, maxLength: number) {
   return typeof value === "string" ? value.trim().slice(0, maxLength) : "";
 }
 
+function describeError(error: unknown) {
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  return String(error);
+}
+
 function toRouteErrorMessage(error: unknown) {
-  const message = error instanceof Error ? error.message : "Unexpected error";
+  const message = describeError(error);
 
   if (message.includes("Cloudflare D1 binding `DB` is unavailable")) {
     return "The RSVP table is not connected on this deployment yet. Please try again later.";
@@ -36,16 +46,31 @@ async function saveToGoogleSheet(rsvp: {
 
   const response = await fetch(webhookUrl, {
     method: "POST",
-    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       ...rsvp,
       secret: process.env.RSVP_GOOGLE_SHEET_WEBHOOK_SECRET ?? "",
       submittedAt: new Date().toISOString(),
     }),
   });
+  const responseText = await response.text();
 
   if (!response.ok) {
-    throw new Error("Google Sheet RSVP sync failed.");
+    throw new Error(
+      `Google Sheet RSVP sync failed with HTTP ${response.status}: ${responseText.slice(0, 160)}`
+    );
+  }
+
+  let result: { ok?: boolean; error?: string } = {};
+
+  try {
+    result = responseText ? (JSON.parse(responseText) as { ok?: boolean; error?: string }) : {};
+  } catch {
+    throw new Error(`Google Sheet RSVP sync returned non-JSON: ${responseText.slice(0, 160)}`);
+  }
+
+  if (result.ok !== true) {
+    throw new Error(result.error || "Google Sheet RSVP sync did not confirm success.");
   }
 
   return true;
@@ -111,11 +136,25 @@ export async function POST(request: Request) {
       attending,
     } as const;
 
-    const savedToGoogleSheet = await saveToGoogleSheet(rsvp);
+    let savedToGoogleSheet = false;
+    let sheetSyncError: string | null = null;
+
+    try {
+      savedToGoogleSheet = await saveToGoogleSheet(rsvp);
+    } catch (error) {
+      sheetSyncError = describeError(error);
+      console.error("RSVP Google Sheet sync failed", {
+        ...rsvp,
+        submittedAt: new Date().toISOString(),
+        error: sheetSyncError,
+      });
+    }
 
     if (savedToGoogleSheet) {
       return Response.json({ ok: true }, { status: 201 });
     }
+
+    let savedToFallbackDatabase = false;
 
     try {
       const { getDb } = await import("../../../db");
@@ -127,8 +166,9 @@ export async function POST(request: Request) {
         plusOneName: rsvp.plusOneName,
         attending: rsvp.attending,
       });
+      savedToFallbackDatabase = true;
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Unexpected error";
+      const message = describeError(error);
 
       const isMissingDatabase =
         message.includes("Cloudflare D1 binding `DB` is unavailable") ||
@@ -142,11 +182,27 @@ export async function POST(request: Request) {
         ...rsvp,
         guestSlug,
         submittedAt: new Date().toISOString(),
+        sheetSyncError,
       });
+    }
+
+    if (sheetSyncError && !savedToFallbackDatabase) {
+      return Response.json(
+        {
+          error:
+            "We received your RSVP, but the tracker is not connected correctly yet. Please send this link to Sama or Hisham.",
+        },
+        { status: 500 }
+      );
     }
 
     return Response.json({ ok: true }, { status: 201 });
   } catch (error) {
+    console.error("RSVP route failed", {
+      error: describeError(error),
+      submittedAt: new Date().toISOString(),
+    });
+
     return Response.json(
       { error: toRouteErrorMessage(error) },
       { status: 500 }

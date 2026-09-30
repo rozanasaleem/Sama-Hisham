@@ -807,6 +807,22 @@ export const invitedGuests = [
     "canBringPlusOne": true,
     "plusOneName": "",
     "language": "en"
+  },
+  {
+    "slug": "sh-d33dc22e",
+    "name": "Yasmeen Hamad",
+    "firstName": "Yasmeen",
+    "canBringPlusOne": false,
+    "plusOneName": "",
+    "language": "en"
+  },
+  {
+    "slug": "sh-8355557e",
+    "name": "Zeina Barghouthi",
+    "firstName": "Zeina",
+    "canBringPlusOne": true,
+    "plusOneName": "Abed",
+    "language": "en"
   }
 ] satisfies InvitedGuest[];
 

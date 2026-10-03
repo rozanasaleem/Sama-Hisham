@@ -101,7 +101,7 @@ export async function POST(request: Request) {
       payload.firstName ?? nameParts[0] ?? "",
       80
     );
-    const lastName = cleanText(
+    const parsedLastName = cleanText(
       payload.lastName ?? nameParts.slice(1).join(" "),
       80
     );
@@ -111,6 +111,8 @@ export async function POST(request: Request) {
       attending === "yes" && invitedGuest?.canBringPlusOne && plusOneIncluded
         ? cleanText(payload.plusOneName, 120)
         : "";
+    const lastName =
+      parsedLastName || cleanText(invitedGuest?.plusOneName ?? "", 80) || firstName;
 
     if (!invitedGuest) {
       return Response.json(
@@ -119,9 +121,9 @@ export async function POST(request: Request) {
       );
     }
 
-    if (!firstName || !lastName) {
+    if (!firstName) {
       return Response.json(
-        { error: "Please add your first and last name." },
+        { error: "Please open your personal invitation link to RSVP." },
         { status: 400 }
       );
     }

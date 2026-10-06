@@ -754,8 +754,8 @@ export const invitedGuests = [
   },
   {
     "slug": "sh-fdef4a10",
-    "name": "Malak Dirawi",
-    "firstName": "Malak",
+    "name": "Cecilia Tannous",
+    "firstName": "Cecilia",
     "canBringPlusOne": false,
     "plusOneName": "",
     "language": "en"
@@ -837,6 +837,54 @@ export const invitedGuests = [
     "name": "Aleen Shhab",
     "firstName": "Aleen",
     "canBringPlusOne": false,
+    "plusOneName": "",
+    "language": "en"
+  },
+  {
+    "slug": "sh-aa0a25ec",
+    "name": "Hala Farraj",
+    "firstName": "Hala",
+    "canBringPlusOne": false,
+    "plusOneName": "",
+    "language": "en"
+  },
+  {
+    "slug": "sh-43debabe",
+    "name": "Sari Jaber",
+    "firstName": "Sari",
+    "canBringPlusOne": false,
+    "plusOneName": "",
+    "language": "en"
+  },
+  {
+    "slug": "sh-d7ef039d",
+    "name": "Iman Irqat",
+    "firstName": "Iman",
+    "canBringPlusOne": false,
+    "plusOneName": "",
+    "language": "en"
+  },
+  {
+    "slug": "sh-4ff54859",
+    "name": "Taleen Nasser",
+    "firstName": "Taleen",
+    "canBringPlusOne": false,
+    "plusOneName": "",
+    "language": "en"
+  },
+  {
+    "slug": "sh-db4db40c",
+    "name": "Tamer Hinnawi",
+    "firstName": "Tamer",
+    "canBringPlusOne": true,
+    "plusOneName": "",
+    "language": "en"
+  },
+  {
+    "slug": "sh-72605248",
+    "name": "Awad Rimawi",
+    "firstName": "Awad",
+    "canBringPlusOne": true,
     "plusOneName": "",
     "language": "en"
   }

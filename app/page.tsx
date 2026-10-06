@@ -17,6 +17,12 @@ const detailImages = [
 type Lang = "en" | "ar";
 type RsvpStatus = "idle" | "submitting" | "success" | "error";
 type TimelineIconName = "reception" | "entrance" | "dinner" | "party";
+type ExistingRsvp = {
+  attending?: "yes" | "no";
+  plusOneAttending?: "yes" | "no";
+  plusOneName?: string;
+  submittedAt?: string;
+};
 
 const timelineIcons: Record<TimelineIconName, { src: string; width: number; height: number }> = {
   reception: { src: "/timeline-reception.png", width: 1165, height: 1350 },
@@ -93,6 +99,13 @@ const copy = {
       decline: "No attend",
       sending: "Sending...",
       success: "Thank you. Your RSVP has been saved.",
+      alreadyYes: "Your RSVP is already saved as attending.",
+      alreadyNo: "Your RSVP is already saved as not attending.",
+      alreadyWithPlusOne: (name: string) => `We have you attending with ${name}.`,
+      alreadySubmittedAt: (date: string) => `Last updated: ${date}`,
+      change: "Change RSVP",
+      keep: "Keep RSVP",
+      checking: "Checking your RSVP...",
       error: "Something went wrong. Please try again.",
     },
   },
@@ -147,6 +160,13 @@ const copy = {
       decline: "مش رح أقدر",
       sending: "عم نرسل...",
       success: "شكراً إلكم. وصلنا ردكم.",
+      alreadyYes: "تأكيد حضوركم محفوظ عندنا.",
+      alreadyNo: "ردكم محفوظ إنكم مش رح تقدروا تحضروا.",
+      alreadyWithPlusOne: (name: string) => `مسجلين حضوركم مع ${name}.`,
+      alreadySubmittedAt: (date: string) => `آخر تحديث: ${date}`,
+      change: "تعديل الرد",
+      keep: "خلي الرد زي ما هو",
+      checking: "عم نتأكد من ردكم...",
       error: "صار خطأ بسيط. جرّبوا كمان مرة.",
     },
   },
@@ -157,6 +177,9 @@ export default function Home() {
   const [status, setStatus] = useState<RsvpStatus>("idle");
   const [message, setMessage] = useState("");
   const [guestSlug, setGuestSlug] = useState("");
+  const [existingRsvp, setExistingRsvp] = useState<ExistingRsvp | null>(null);
+  const [isCheckingRsvp, setIsCheckingRsvp] = useState(false);
+  const [isChangingRsvp, setIsChangingRsvp] = useState(false);
   const [countdown, setCountdown] = useState([0, 0, 0, 0]);
   const [videoReady, setVideoReady] = useState(false);
   const [videoFailed, setVideoFailed] = useState(false);
@@ -194,6 +217,41 @@ export default function Home() {
       setLang(selectedGuest.language);
     }
   }, [selectedGuest?.language]);
+
+  useEffect(() => {
+    if (!selectedGuest?.slug) {
+      setExistingRsvp(null);
+      setIsChangingRsvp(false);
+      return;
+    }
+
+    let isCurrent = true;
+    setIsCheckingRsvp(true);
+    setExistingRsvp(null);
+    setIsChangingRsvp(false);
+
+    fetch(`/api/rsvp?guestSlug=${encodeURIComponent(selectedGuest.slug)}`)
+      .then((response) => (response.ok ? response.json() : null))
+      .then((result: { rsvp?: ExistingRsvp | null } | null) => {
+        if (isCurrent) {
+          setExistingRsvp(result?.rsvp ?? null);
+        }
+      })
+      .catch(() => {
+        if (isCurrent) {
+          setExistingRsvp(null);
+        }
+      })
+      .finally(() => {
+        if (isCurrent) {
+          setIsCheckingRsvp(false);
+        }
+      });
+
+    return () => {
+      isCurrent = false;
+    };
+  }, [selectedGuest?.slug]);
 
   useEffect(() => {
     function updateCountdown() {
@@ -315,6 +373,13 @@ export default function Home() {
         throw new Error(result.error ?? t.rsvp.error);
       }
 
+      setExistingRsvp({
+        attending: payload.attending as "yes" | "no",
+        plusOneAttending: payload.plusOneName ? "yes" : "no",
+        plusOneName: payload.plusOneName,
+        submittedAt: "",
+      });
+      setIsChangingRsvp(false);
       setStatus("success");
       setMessage(t.rsvp.success);
       form.reset();
@@ -496,7 +561,7 @@ export default function Home() {
           ) : null}
 
           {selectedGuest?.canBringPlusOne && !namedPlusOne ? (
-            <label className="full">
+            <label className={`full ${existingRsvp && !isChangingRsvp ? "is-hidden" : ""}`}>
               {t.rsvp.plusOneName}
               <input type="hidden" name="plusOneIncluded" value="yes" />
               <input
@@ -504,6 +569,7 @@ export default function Home() {
                 type="text"
                 autoComplete="name"
                 placeholder={t.rsvp.plusOneHint}
+                defaultValue={existingRsvp?.plusOneName ?? ""}
               />
             </label>
           ) : null}
@@ -513,25 +579,49 @@ export default function Home() {
             <input name="website" type="text" tabIndex={-1} autoComplete="off" />
           </label>
 
-          <div className="rsvp-actions">
-            <button
-              type="submit"
-              name="attending"
-              value="yes"
-              disabled={status === "submitting" || !selectedGuest}
-            >
-              {status === "submitting" ? t.rsvp.sending : t.rsvp.attend}
-            </button>
-            <button
-              type="submit"
-              name="attending"
-              value="no"
-              className="decline"
-              disabled={status === "submitting" || !selectedGuest}
-            >
-              {t.rsvp.decline}
-            </button>
-          </div>
+          {isCheckingRsvp ? (
+            <p className="existing-rsvp full">{t.rsvp.checking}</p>
+          ) : null}
+
+          {existingRsvp && !isChangingRsvp ? (
+            <div className="existing-rsvp full">
+              <p>{existingRsvp.attending === "no" ? t.rsvp.alreadyNo : t.rsvp.alreadyYes}</p>
+              {existingRsvp.plusOneAttending === "yes" && existingRsvp.plusOneName ? (
+                <p>{t.rsvp.alreadyWithPlusOne(existingRsvp.plusOneName)}</p>
+              ) : null}
+              {existingRsvp.submittedAt ? (
+                <small>{t.rsvp.alreadySubmittedAt(existingRsvp.submittedAt)}</small>
+              ) : null}
+              <div className="rsvp-actions">
+                <button type="button" onClick={() => setIsChangingRsvp(true)}>
+                  {t.rsvp.change}
+                </button>
+                <button type="button" className="decline" onClick={() => setMessage("")}>
+                  {t.rsvp.keep}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="rsvp-actions">
+              <button
+                type="submit"
+                name="attending"
+                value="yes"
+                disabled={status === "submitting" || !selectedGuest || isCheckingRsvp}
+              >
+                {status === "submitting" ? t.rsvp.sending : t.rsvp.attend}
+              </button>
+              <button
+                type="submit"
+                name="attending"
+                value="no"
+                className="decline"
+                disabled={status === "submitting" || !selectedGuest || isCheckingRsvp}
+              >
+                {t.rsvp.decline}
+              </button>
+            </div>
+          )}
           {message ? (
             <p className={`form-message ${status}`} role="status">
               {message}

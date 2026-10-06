@@ -29,7 +29,7 @@ function toRouteErrorMessage(error: unknown) {
   return "Unable to save your RSVP. Please try again.";
 }
 
-async function saveToGoogleSheet(rsvp: {
+type RsvpPayload = {
   guestSlug: string;
   guestName: string;
   firstName: string;
@@ -37,20 +37,28 @@ async function saveToGoogleSheet(rsvp: {
   plusOneIncluded: boolean;
   plusOneName: string | null;
   attending: "yes" | "no";
-}) {
+};
+
+type SheetRsvpStatus = {
+  attending?: "yes" | "no";
+  plusOneAttending?: "yes" | "no";
+  plusOneName?: string;
+  submittedAt?: string;
+};
+
+async function postToGoogleSheet<T>(payload: Record<string, unknown>) {
   const webhookUrl = process.env.RSVP_GOOGLE_SHEET_WEBHOOK_URL;
 
   if (!webhookUrl) {
-    return false;
+    return null;
   }
 
   const response = await fetch(webhookUrl, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      ...rsvp,
+      ...payload,
       secret: process.env.RSVP_GOOGLE_SHEET_WEBHOOK_SECRET ?? "",
-      submittedAt: new Date().toISOString(),
     }),
   });
   const responseText = await response.text();
@@ -61,10 +69,10 @@ async function saveToGoogleSheet(rsvp: {
     );
   }
 
-  let result: { ok?: boolean; error?: string } = {};
+  let result: { ok?: boolean; error?: string } & T = {} as { ok?: boolean; error?: string } & T;
 
   try {
-    result = responseText ? (JSON.parse(responseText) as { ok?: boolean; error?: string }) : {};
+    result = responseText ? (JSON.parse(responseText) as { ok?: boolean; error?: string } & T) : result;
   } catch {
     throw new Error(`Google Sheet RSVP sync returned non-JSON: ${responseText.slice(0, 160)}`);
   }
@@ -73,7 +81,52 @@ async function saveToGoogleSheet(rsvp: {
     throw new Error(result.error || "Google Sheet RSVP sync did not confirm success.");
   }
 
-  return true;
+  return result;
+}
+
+async function saveToGoogleSheet(rsvp: RsvpPayload) {
+  const result = await postToGoogleSheet({
+    ...rsvp,
+    action: "save",
+    submittedAt: new Date().toISOString(),
+  });
+
+  return Boolean(result);
+}
+
+async function getGoogleSheetRsvpStatus(guestSlug: string) {
+  const result = await postToGoogleSheet<{ rsvp?: SheetRsvpStatus | null }>({
+    action: "status",
+    guestSlug,
+  });
+
+  return result?.rsvp ?? null;
+}
+
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const guestSlug = cleanText(searchParams.get("guestSlug"), 80);
+  const invitedGuest = guestSlug ? findInvitedGuest(guestSlug) : undefined;
+
+  if (!invitedGuest) {
+    return Response.json(
+      { error: "Please open your personal invitation link to RSVP." },
+      { status: 400 }
+    );
+  }
+
+  try {
+    const rsvp = await getGoogleSheetRsvpStatus(guestSlug);
+    return Response.json({ ok: true, rsvp });
+  } catch (error) {
+    console.error("RSVP status lookup failed", {
+      guestSlug,
+      error: describeError(error),
+      submittedAt: new Date().toISOString(),
+    });
+
+    return Response.json({ ok: true, rsvp: null });
+  }
 }
 
 export async function POST(request: Request) {

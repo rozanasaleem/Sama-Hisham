@@ -627,12 +627,14 @@ h3 {
 
 .rsvp-form .full,
 .rsvp-actions,
-.form-message {
+.form-message,
+.existing-rsvp {
   grid-column: 1 / -1;
 }
 
 .invited-guest,
-.invitation-missing {
+.invitation-missing,
+.existing-rsvp {
   padding: 16px 18px;
   background: #fbfaf6;
   border: 1px solid var(--line);
@@ -661,6 +663,25 @@ h3 {
   margin: 0;
   color: var(--tangerine);
   line-height: 1.55;
+}
+
+.existing-rsvp {
+  display: grid;
+  gap: 10px;
+  color: var(--foreground);
+  line-height: 1.5;
+}
+
+.existing-rsvp p {
+  margin: 0;
+}
+
+.existing-rsvp small {
+  color: var(--muted);
+}
+
+.is-hidden {
+  display: none;
 }
 
 input,

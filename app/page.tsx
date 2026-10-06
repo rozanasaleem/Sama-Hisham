@@ -226,15 +226,26 @@ export default function Home() {
     }
 
     let isCurrent = true;
+    const localStorageKey = `sama-hisham-rsvp:${selectedGuest.slug}`;
+    const localRsvp = window.localStorage.getItem(localStorageKey);
+    let parsedLocalRsvp: ExistingRsvp | null = null;
+
+    try {
+      parsedLocalRsvp = localRsvp ? (JSON.parse(localRsvp) as ExistingRsvp) : null;
+    } catch {
+      window.localStorage.removeItem(localStorageKey);
+    }
+
     setIsCheckingRsvp(true);
-    setExistingRsvp(null);
+    setExistingRsvp(parsedLocalRsvp);
     setIsChangingRsvp(false);
 
     fetch(`/api/rsvp?guestSlug=${encodeURIComponent(selectedGuest.slug)}`)
       .then((response) => (response.ok ? response.json() : null))
       .then((result: { rsvp?: ExistingRsvp | null } | null) => {
-        if (isCurrent) {
-          setExistingRsvp(result?.rsvp ?? null);
+        if (isCurrent && result?.rsvp) {
+          setExistingRsvp(result.rsvp);
+          window.localStorage.setItem(localStorageKey, JSON.stringify(result.rsvp));
         }
       })
       .catch(() => {
@@ -373,12 +384,15 @@ export default function Home() {
         throw new Error(result.error ?? t.rsvp.error);
       }
 
-      setExistingRsvp({
+      const savedRsvp: ExistingRsvp = {
         attending: payload.attending as "yes" | "no",
         plusOneAttending: payload.plusOneName ? "yes" : "no",
         plusOneName: payload.plusOneName,
         submittedAt: "",
-      });
+      };
+
+      setExistingRsvp(savedRsvp);
+      window.localStorage.setItem(`sama-hisham-rsvp:${payload.guestSlug}`, JSON.stringify(savedRsvp));
       setIsChangingRsvp(false);
       setStatus("success");
       setMessage(t.rsvp.success);

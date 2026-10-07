@@ -161,9 +161,9 @@ export const invitedGuests = [
     "language": "en"
   },
   {
-    "slug": "sh-93924b80",
-    "name": "Hussam Omaia",
-    "firstName": "Hussam",
+    "slug": "sh-faleh-020",
+    "name": "Faleh Naseer Faleh",
+    "firstName": "Faleh",
     "canBringPlusOne": false,
     "plusOneName": "",
     "language": "en"
@@ -489,17 +489,17 @@ export const invitedGuests = [
     "language": "en"
   },
   {
-    "slug": "sh-13cbc4df",
-    "name": "Ziad rafidi",
-    "firstName": "Ziad",
+    "slug": "sh-dina-061",
+    "name": "Dina Moghrabi",
+    "firstName": "Dina",
     "canBringPlusOne": false,
     "plusOneName": "",
     "language": "en"
   },
   {
-    "slug": "sh-b70646d2",
-    "name": "Majed Faraj",
-    "firstName": "Majed",
+    "slug": "sh-areen-062",
+    "name": "Areen Nassar",
+    "firstName": "Areen",
     "canBringPlusOne": true,
     "plusOneName": "",
     "language": "en"

@@ -329,9 +329,9 @@ export const invitedGuests = [
     "language": "en"
   },
   {
-    "slug": "sh-35807d53",
-    "name": "Hasan Quweider",
-    "firstName": "Hassan",
+    "slug": "sh-amr-041",
+    "name": "Amr marouf",
+    "firstName": "Amr",
     "canBringPlusOne": false,
     "plusOneName": "",
     "language": "en"

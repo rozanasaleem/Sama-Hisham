@@ -249,9 +249,9 @@ export const invitedGuests = [
     "language": "en"
   },
   {
-    "slug": "sh-aaff11f5",
-    "name": "Yazan Abdulhadi",
-    "firstName": "Yazan",
+    "slug": "sh-saleem-032",
+    "name": "Saleem Malki",
+    "firstName": "Saleem",
     "canBringPlusOne": true,
     "plusOneName": "",
     "language": "en"

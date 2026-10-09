@@ -49,7 +49,7 @@ function TimelineIcon({ name }: { name: TimelineIconName }) {
 
 const copy = {
   en: {
-    nav: { details: "Details", rsvp: "RSVP", map: "Map", switch: "عربي" },
+    nav: { details: "Details", rsvp: "RSVP", seating: "Seating", map: "Map", switch: "عربي" },
     hero: {
       eyebrow: "The Wedding of",
       title: "Sama Matar & Hisham Daraghme",
@@ -110,7 +110,7 @@ const copy = {
     },
   },
   ar: {
-    nav: { details: "التفاصيل", rsvp: "أكدوا حضوركم", map: "الموقع", switch: "English" },
+    nav: { details: "التفاصيل", rsvp: "أكدوا حضوركم", seating: "المقاعد", map: "الموقع", switch: "English" },
     hero: {
       eyebrow: "حفل زفاف",
       title: "سما مطر وهشام دراغمة",
@@ -447,6 +447,7 @@ export default function Home() {
         <nav className="topline" aria-label="Wedding navigation">
           <a href="#details">{t.nav.details}</a>
           <a href="#rsvp">{t.nav.rsvp}</a>
+          <a href="/seating">{t.nav.seating}</a>
           <a href={mapUrl} target="_blank" rel="noreferrer">
             {t.nav.map}
           </a>

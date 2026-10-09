@@ -777,6 +777,162 @@ a:focus-visible {
   left: -9999px;
 }
 
+.seating-page {
+  min-height: 100svh;
+  background: #fbfaf6;
+}
+
+.seating-hero {
+  position: relative;
+  display: grid;
+  min-height: 100svh;
+  place-items: center;
+  padding: clamp(24px, 5vw, 64px);
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.seating-hero::before {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  content: "";
+  background: url("/couple-arch.jpg") center / cover;
+  filter: saturate(0.85) contrast(0.94);
+}
+
+.seating-hero::after {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  content: "";
+  background:
+    linear-gradient(180deg, rgba(251, 250, 246, 0.62), rgba(251, 250, 246, 0.9)),
+    linear-gradient(90deg, rgba(88, 102, 74, 0.34), rgba(210, 116, 125, 0.28));
+}
+
+.seating-home-link {
+  position: absolute;
+  top: clamp(18px, 4vw, 34px);
+  left: clamp(18px, 4vw, 48px);
+  color: var(--foreground);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.05rem, 2vw, 1.45rem);
+}
+
+.seating-panel {
+  width: min(620px, 100%);
+  padding: clamp(28px, 6vw, 56px);
+  background: rgba(255, 253, 249, 0.92);
+  border: 1px solid rgba(88, 102, 74, 0.16);
+  box-shadow: 0 24px 70px rgba(41, 48, 34, 0.18);
+}
+
+.seating-panel h1 {
+  margin: 0;
+  color: var(--foreground);
+  font-size: clamp(3.1rem, 11vw, 6.8rem);
+  opacity: 1;
+  transform: none;
+  animation: none;
+}
+
+.seating-intro {
+  max-width: 420px;
+  margin: 18px 0 28px;
+  color: var(--muted);
+  font-size: clamp(1rem, 2vw, 1.12rem);
+  line-height: 1.6;
+}
+
+.seating-search {
+  display: grid;
+  gap: 9px;
+  color: var(--foreground);
+  font-weight: 700;
+}
+
+.seating-search span {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+}
+
+.seating-search input {
+  min-height: 58px;
+  border-color: rgba(88, 102, 74, 0.24);
+  background: #fffdf9;
+  font-size: 1.06rem;
+}
+
+.seating-results {
+  display: grid;
+  gap: 12px;
+  min-height: 124px;
+  margin-top: 18px;
+}
+
+.table-result {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: center;
+  padding: 18px;
+  background: #fbfaf6;
+  border: 1px solid var(--line);
+}
+
+.table-result span,
+.table-number span {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.table-result strong {
+  color: var(--foreground);
+  font-size: clamp(1.1rem, 3.8vw, 1.45rem);
+}
+
+.table-number {
+  min-width: 92px;
+  padding: 12px 14px;
+  background: var(--rose);
+  color: #fffdf9;
+  text-align: center;
+}
+
+.table-number span,
+.table-number strong {
+  color: #fffdf9;
+}
+
+.table-number strong {
+  display: block;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(2rem, 8vw, 3rem);
+  font-weight: 400;
+  line-height: 0.9;
+}
+
+.seating-empty {
+  display: grid;
+  gap: 6px;
+  align-content: center;
+  margin: 0;
+  padding: 20px;
+  color: var(--muted);
+  line-height: 1.5;
+  background: rgba(209, 226, 197, 0.34);
+  border: 1px solid rgba(157, 193, 131, 0.36);
+}
+
+.seating-empty strong {
+  color: var(--foreground);
+}
+
 @keyframes coverReveal {
   to {
     opacity: 1;
@@ -871,6 +1027,23 @@ a:focus-visible {
 
   .rsvp-form {
     grid-template-columns: 1fr;
+  }
+
+  .seating-hero {
+    align-items: end;
+    padding: 76px 14px 14px;
+  }
+
+  .seating-panel {
+    padding: 28px 18px 22px;
+  }
+
+  .table-result {
+    grid-template-columns: 1fr;
+  }
+
+  .table-number {
+    width: 100%;
   }
 
 }
